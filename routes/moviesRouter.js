@@ -37,7 +37,10 @@ router.post("/", async (req, res, next) => {
       "INSERT INTO movies (title, genres, year) VALUES ($1, $2, $3) RETURNING *",
       [title, genres, year]
     );
-    res.status(200).json(newMovie.rows[0]);
+    res.status(201).json({
+      message: "Movie successfully added",
+      movie: newMovie.rows[0],
+    });
   } catch (err) {
     next(err);
   }
@@ -58,7 +61,10 @@ router.put("/:id", async (req, res, next) => {
       error.name = "ErrorNotFound";
       throw error;
     }
-    res.status(200).json(updatedMovie.rows[0]);
+    res.status(200).json({
+      message: "Movie successfully updated",
+      movie: updatedMovie.rows[0],
+    });
   } catch (err) {
     next(err);
   }
