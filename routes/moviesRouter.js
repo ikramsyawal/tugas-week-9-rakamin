@@ -1,12 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/queries");
+const { authorization } = require("../middlewares/auth");
 
 // get all movies
 router.get("/", async (req, res, next) => {
   try {
-    const allMovies = await pool.query("SELECT * FROM movies");
-    res.json(allMovies.rows);
+    const page = req.query.page || 1;
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
+    const allMovies = await pool.query(
+      `SELECT * FROM movies ORDER BY id LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+    res
+      .status(200)
+      .json({ message: `Page ${page} of movies`, movies: allMovies.rows });
   } catch (err) {
     next(err);
   }
@@ -29,7 +39,7 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // post a movie
-router.post("/", async (req, res, next) => {
+router.post("/", authorization, async (req, res, next) => {
   try {
     const { title, genres, year } = req.body;
 
@@ -47,7 +57,7 @@ router.post("/", async (req, res, next) => {
 });
 
 // update a movie
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", authorization, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title, genres, year } = req.body;
@@ -71,7 +81,7 @@ router.put("/:id", async (req, res, next) => {
 });
 
 // delete a movie
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", authorization, async (req, res, next) => {
   try {
     const { id } = req.params;
     const deletedMovie = await pool.query(

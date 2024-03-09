@@ -1,12 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db/queries");
+const { authorization } = require("../middlewares/auth");
 
 // get all users
 router.get("/", async (req, res, next) => {
   try {
-    const allUsers = await pool.query("SELECT * FROM users");
-    res.status(200).json(allUsers.rows);
+    const page = req.query.page || 1;
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
+    const allUsers = await pool.query(
+      "SELECT * FROM users ORDER BY id LIMIT $1 OFFSET $2",
+      [limit, offset]
+    );
+    res
+      .status(200)
+      .json({ message: `Page ${page} of users `, user: allUsers.rows });
   } catch (err) {
     next(err);
   }
@@ -29,7 +39,7 @@ router.get("/:id", async (req, res, next) => {
 });
 
 // post a new user
-router.post("/", async (req, res, next) => {
+router.post("/", authorization, async (req, res, next) => {
   try {
     const { email, gender, password, role } = req.body;
     const newUser = await pool.query(
@@ -46,7 +56,7 @@ router.post("/", async (req, res, next) => {
 });
 
 // update a user
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", authorization, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { email, gender, password, role } = req.body;
@@ -70,7 +80,7 @@ router.put("/:id", async (req, res, next) => {
 });
 
 // delete a user
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", authorization, async (req, res, next) => {
   try {
     const { id } = req.params;
     const deletedUser = await pool.query(
