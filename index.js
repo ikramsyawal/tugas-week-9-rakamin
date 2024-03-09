@@ -3,6 +3,9 @@ const app = express();
 const port = 3000;
 const router = require("./routes/router");
 const errorHandler = require("./middlewares/errorHandler");
+const morgan = require("morgan");
+
+app.use(morgan("combined"));
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");

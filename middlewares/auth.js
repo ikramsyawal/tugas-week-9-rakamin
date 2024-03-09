@@ -37,7 +37,6 @@ const authentication = async (req, res, next) => {
 
 const authorization = async (req, res, next) => {
   try {
-    console.log(req.loggedUser);
     const { role } = req.loggedUser;
 
     if (role === "admin") {
