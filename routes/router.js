@@ -1,21 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db/queries");
+const moviesRouter = require("./moviesRouter.js");
 
-router.get("/get", (req, res) => {
-  res.send("Hello from get");
+router.get("/", (req, res) => {
+  res.send("Welcome to the API");
 });
-
-router.post("/post", (req, res) => {
-  res.send("Hello from post");
-});
-
-router.put("/put", (req, res) => {
-  res.send("Hello from put");
-});
-
-router.delete("/delete", (req, res) => {
-  res.send("Hello from delete");
-});
+router.use("/movies", moviesRouter);
 
 module.exports = router;
